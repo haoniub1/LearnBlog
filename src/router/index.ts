@@ -15,6 +15,12 @@ const router = createRouter({
       component: HomeView,
     },
     {
+      // 动态路由：:id 是参数占位符，类比 Go Gin 的 /article/:id
+      path: '/article/:id',
+      name: 'article',
+      component: () => import('../views/ArticleView.vue'),
+    },
+    {
       path: '/archive',
       name: 'archive',
       component: () => import('../views/ArchiveView.vue'),

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import type { Article } from '@/types/article'
 
 // 声明这个组件接收的 props（从父组件传进来的数据）
@@ -6,14 +7,22 @@ import type { Article } from '@/types/article'
 // q 这个 defineProps是什么语法 <{}>() ?
 // a defineProps 是 Vue 宏函数。<{ article: Article }> 是 TypeScript 泛型，定义参数类型。() 是调用。
 // a 整体意思：声明这个组件必须传入一个 Article 类型的 article 属性。
-defineProps<{
+const props = defineProps<{
   article: Article
 }>()
+
+// useRouter() 获取路由实例，可以用代码跳转页面
+// 类比 Go：http.Redirect(w, r, "/article/1", 302)
+const router = useRouter()
+
+function goToArticle() {
+  router.push(`/article/${props.article.id}`)
+}
 </script>
 
 <template>
 <!--  q el-card又是什么？ 是elment的自定义组件吗？-->
-  <el-card class="article-card" shadow="hover">
+  <el-card class="article-card" shadow="hover" @click="goToArticle">
 <!--    q 这里还有一个 template 是干嘛的？-->
 <!--    a 这是"插槽（slot）"。el-card 预留了 #header 和默认两个坑位，你往里填内容。-->
 <!--    a #header 的内容渲染到卡片头部区域，其余内容放到卡片主体区域。-->
