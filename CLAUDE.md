@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 开发者背景
 
-- 后端开发者（Go），前端新手，有 Qt 桌面开发基础
+- 后端开发者（Go），前端新手，有 C++ 和 Qt 桌面开发基础
 - 不需要解释通用编程概念（变量、循环、函数等）
 
 ## 命令
@@ -46,6 +46,6 @@ src/
 ## 教学模式
 
 - 每次只做一个小功能
-- 用 Go/Qt 概念做类比解释前端概念
+- 用 Go/C++/Qt 概念做类比解释前端概念
 - 先说要做什么，等确认后再写代码
 - 只解释前端特有的概念
