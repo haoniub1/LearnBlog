@@ -7,6 +7,9 @@ import type { Article } from '@/types/article'
 // q 这个 defineProps是什么语法 <{}>() ?
 // a defineProps 是 Vue 宏函数。<{ article: Article }> 是 TypeScript 泛型，定义参数类型。() 是调用。
 // a 整体意思：声明这个组件必须传入一个 Article 类型的 article 属性。
+// q 这里为什么又改为const了？
+// a 因为 goToArticle() 里需要用 props.article.id。不存返回值的话，在 <script> 里拿不到 props。
+// a 在 <template> 里可以直接写 {{ article.title }}，但在 <script> 的函数里必须通过 props.article 访问。
 const props = defineProps<{
   article: Article
 }>()
@@ -16,12 +19,18 @@ const props = defineProps<{
 const router = useRouter()
 
 function goToArticle() {
+  // q push是什么意思？跟post get push那个请求方式是一个意思吗？
+  // a 跟 HTTP 无关。push 是"压入历史记录栈"，浏览器历史是个 stack，push 加一条，返回键 pop 一条。
+  // a 类比 C++：std::stack history; history.push("/article/1");
+  // a 还有 router.replace()，不压栈直接替换，返回时不会回到被替换的页面。
   router.push(`/article/${props.article.id}`)
 }
 </script>
 
 <template>
 <!--  q el-card又是什么？ 是elment的自定义组件吗？-->
+<!--  a 对，el- 开头的都是 Element Plus 的组件。main.ts 里 app.use(ElementPlus) 注册后全局可用。-->
+<!--  a 常见的：el-card（卡片）、el-button（按钮）、el-tag（标签）、el-input（输入框）、el-table（表格）等。-->
   <el-card class="article-card" shadow="hover" @click="goToArticle">
 <!--    q 这里还有一个 template 是干嘛的？-->
 <!--    a 这是"插槽（slot）"。el-card 预留了 #header 和默认两个坑位，你往里填内容。-->
