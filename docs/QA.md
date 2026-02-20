@@ -156,6 +156,41 @@ export default {
 - 默认导出 → `import http "net/http"`，别名随便取
 - 命名导出 → Go 没有对应概念，但类似 `pkg.FuncA` / `pkg.FuncB` 要指定用包里的哪个函数
 
+### computed 为什么不直接用函数？
+
+**区别就一个：缓存。**
+
+- 普通函数：每次模板渲染都重新执行，哪怕依赖数据没变
+- computed：依赖数据没变就直接返回缓存结果，变了才重新算
+
+```typescript
+// 文章列表是响应式的
+const articles = ref<Article[]>([])
+
+// computed 依赖 articles，articles 变了才重新分组
+const groupedArticles = computed(() => {
+  // 分组逻辑...
+})
+```
+
+**流程：**
+1. `articles = []` → computed 第一次计算，缓存结果
+2. API 返回数据，`articles.value = [...]` → articles 变了 → computed 标记 dirty → 重新算
+3. 其他不相关的数据变了 → 模板重新渲染 → articles 没变 → 直接返回缓存（省了一次计算）
+
+**Mock 数据是固定 const，不是 ref，Vue 知道它不会变，所以 computed 只算一次就永远用缓存。**
+
+C++ 类比：带 dirty 标记的懒计算缓存类。dirty=true 重新算，dirty=false 直接返回 cache。
+
+Go 类比：struct 存 cache + dirty 字段，Get() 判断 dirty 决定是否重新计算。
+
+**什么时候用哪个：**
+| | computed | 函数 |
+|--|---------|------|
+| 缓存 | 有 | 没有 |
+| 模板里 | `groupedArticles`（不加括号） | `getGrouped()`（加括号） |
+| 适合 | 从已有数据派生新数据 | 有副作用（发请求、改 DOM） |
+
 ---
 
 ## Vue 模板语法速查
@@ -168,3 +203,37 @@ export default {
 | `:prop="data"` | 传数据给子组件 | 函数传参 |
 | `@click="handler"` | 绑定事件 | 事件回调 |
 | `defineProps<{ ... }>()` | 声明组件参数 | `func(param Type)` |
+
+---
+
+## 经验
+
+### CSS 怎么写？不需要背属性
+
+组件库（Element Plus）解决 80% 的样式，自己写的 CSS 就这几个反复用的模式：
+
+```css
+/* 居中容器（几乎每个页面） */
+max-width: 800px;
+margin: 0 auto;
+
+/* 元素间距 */
+margin-bottom: 16px;
+gap: 8px;
+
+/* 一行左右分布 */
+display: flex;
+justify-content: space-between;
+
+/* 文字样式微调 */
+color: #909399;
+font-size: 14px;
+```
+
+**实际工作流：**
+1. 先不写 CSS，看组件库默认效果
+2. 浏览器 F12 → 看哪里不对
+3. 在 F12 的 Styles 面板里实时调，调到满意
+4. 把调好的 CSS 复制到代码里
+
+不需要背 CSS 属性，F12 是最好的工具。遇到不会的布局搜一下或者问就行。

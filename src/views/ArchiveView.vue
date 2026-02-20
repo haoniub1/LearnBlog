@@ -4,6 +4,11 @@ import { mockArticles } from '@/mock/articles'
 
 // 把文章按月份分组
 // 类比 Go：map[string][]Article{"2026-02": [{...}, {...}]}
+// q 这里我感觉 直接使用一个 函数不就行了吗？为什么要用一个 computed？用go 或者c++ 解释下？
+// a computed 比普通函数多一个能力：缓存。依赖数据（mockArticles）没变就直接返回上次结果，不重新算。
+// a 普通函数每次渲染都重新跑一遍分组逻辑，哪怕数据没变也要算。
+// a C++ 类比：带 dirty 标记的懒计算。dirty=true 时重新算并缓存，dirty=false 直接返回 cache。
+// a Go 类比：struct 里存 cache + dirty 字段，Get() 时判断 dirty 决定是否重新计算。
 const groupedArticles = computed(() => {
   const groups: Record<string, typeof mockArticles> = {}
   for (const article of mockArticles) {
